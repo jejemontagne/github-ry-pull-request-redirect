@@ -1,9 +1,10 @@
 # GitHub PR Whitespace Hider
 
-A simple Chrome extension that automatically adds the `?w=1` parameter to GitHub Pull Request file URLs to hide whitespace changes.
+A simple Chrome extension that automatically adds the `?w=1` parameter to GitHub Pull Request file URLs to hide whitespace changes, and adds useful shortcuts for PR management.
 
-## Feature
+## Features
 
+### Whitespace Hiding
 This extension detects when you visit a URL like:
 ```
 https://github.com/COMPANY-NAME/PROJECT-NAME/pull/xxxx/files
@@ -15,6 +16,15 @@ https://github.com/COMPANY-NAME/PROJECT-NAME/pull/xxxx/files?w=1
 ```
 
 The `?w=1` parameter tells GitHub to hide changes that only affect whitespace, making code review clearer.
+
+### Keyboard Shortcuts
+
+1. **Toggle Viewed Checkboxes** - `Cmd+Shift+O` (Mac) or `Ctrl+Shift+O` (Windows/Linux)  
+   Unchecks all currently checked "viewed" checkboxes in PR file views.
+
+2. **Copy PR List** - `Cmd+Shift+S` (Mac) or `Ctrl+Shift+S` (Windows/Linux)  
+   When viewing a PR list page (`https://github.com/*/pulls`), formats and copies all non-draft PRs to clipboard.
+   PRs with the "Review: Approved 🚀" label are marked with a ✅.
 
 ## Installation
 
@@ -31,7 +41,8 @@ The `?w=1` parameter tells GitHub to hide changes that only affect whitespace, m
 ## Extension Contents
 
 - `manifest.json`: Extension configuration
-- `background.js`: Script that detects and modifies URLs
+- `background.js`: Script that detects and modifies URLs, processes keyboard shortcuts
+- `content.js`: Content script for page interaction
 - `icon.svg`: Vector icon for the extension
 
 ## File Structure
@@ -40,9 +51,19 @@ The `?w=1` parameter tells GitHub to hide changes that only affect whitespace, m
 github-pr-whitespace-hider/
 ├── manifest.json
 ├── background.js
+├── content.js
 ├── icon.svg
 └── README.md
 ```
+
+## Permissions
+
+The extension requires the following permissions:
+- `webNavigation`: To detect navigation to PR file views
+- `tabs`: To update tabs with modified URLs
+- `activeTab`: To access the active tab content
+- `scripting`: To execute scripts in page context
+- `clipboardWrite`: To copy PR list to clipboard
 
 ## Notes
 
