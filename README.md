@@ -17,6 +17,9 @@ https://github.com/COMPANY-NAME/PROJECT-NAME/pull/xxxx/files?w=1
 
 The `?w=1` parameter tells GitHub to hide changes that only affect whitespace, making code review clearer.
 
+### Wider Sidebar
+When viewing PR files with the `?w=1` parameter, the extension automatically increases the width of the sidebar by 100px for better readability.
+
 ### Keyboard Shortcuts
 
 1. **Toggle Viewed Checkboxes** - `Cmd+Shift+O` (Mac) or `Ctrl+Shift+O` (Windows/Linux)  
