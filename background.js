@@ -16,6 +16,25 @@ function transformUrl(url) {
   return null; // No transformation needed
 }
 
+// Function to inject CSS for wider sidebar
+function injectWideSidebar(tabId) {
+  chrome.scripting.executeScript({
+    target: { tabId: tabId },
+    function: () => {
+      // Create a style element
+      const style = document.createElement('style');
+      style.textContent = `
+        .Layout-sidebar.diff-sidebar {
+          width: calc(var(--Layout-sidebar-width) + 100px) !important;
+        }
+      `;
+      // Add the style to the document
+      document.head.appendChild(style);
+      console.log("GitHub PR Whitespace Hider: Sidebar width increased by 100px");
+    }
+  });
+}
+
 // Listener for completed navigations (full page loads)
 chrome.webNavigation.onCompleted.addListener(
   function(details) {
@@ -23,12 +42,17 @@ chrome.webNavigation.onCompleted.addListener(
     if (newUrl) {
       chrome.tabs.update(details.tabId, { url: newUrl });
     }
+    
+    // If it's a PR files page with w=1 parameter, increase sidebar width
+    if (details.url.match(/https:\/\/github\.com\/.*\/pull\/.*\/files(\?|\&)w=1/)) {
+      injectWideSidebar(details.tabId);
+    }
   },
   {
     url: [{
       hostEquals: 'github.com',
       pathContains: '/pull/',
-      pathSuffix: '/files'
+      pathContains: '/files'
     }]
   }
 );
@@ -40,12 +64,17 @@ chrome.webNavigation.onHistoryStateUpdated.addListener(
     if (newUrl) {
       chrome.tabs.update(details.tabId, { url: newUrl });
     }
+    
+    // If it's a PR files page with w=1 parameter, increase sidebar width
+    if (details.url.match(/https:\/\/github\.com\/.*\/pull\/.*\/files(\?|\&)w=1/)) {
+      injectWideSidebar(details.tabId);
+    }
   },
   {
     url: [{
       hostEquals: 'github.com',
       pathContains: '/pull/',
-      pathSuffix: '/files'
+      pathContains: '/files'
     }]
   }
 );
@@ -57,6 +86,11 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
     const newUrl = transformUrl(changeInfo.url);
     if (newUrl) {
       chrome.tabs.update(tabId, { url: newUrl });
+    }
+    
+    // If it's a PR files page with w=1 parameter, increase sidebar width
+    if (changeInfo.url && changeInfo.url.match(/https:\/\/github\.com\/.*\/pull\/.*\/files(\?|\&)w=1/)) {
+      injectWideSidebar(tabId);
     }
   }
 });
