@@ -3,7 +3,7 @@
   "name": "GitHub PR Whitespace Hider",
   "version": "1.0",
   "description": "Automatically adds ?w=1 to GitHub Pull Request file URLs to hide whitespace changes",
-  "permissions": ["webNavigation", "tabs"],
+  "permissions": ["webNavigation", "tabs", "activeTab", "scripting", "clipboardWrite"],
   "host_permissions": ["*://github.com/*"],
   "background": {
     "service_worker": "background.js"
@@ -14,5 +14,31 @@
   },
   "icons": {
     "128": "icon.svg"
-  }
+  },
+  "commands": {
+    "toggle-viewed-checkboxes": {
+      "suggested_key": {
+        "mac": "Command+Shift+O",
+        "windows": "Ctrl+Shift+O",
+        "chromeos": "Ctrl+Shift+O",
+        "linux": "Ctrl+Shift+O"
+      },
+      "description": "Toggle viewed checkboxes"
+    },
+    "copy-pr-list": {
+      "suggested_key": {
+        "mac": "Command+Shift+S",
+        "windows": "Ctrl+Shift+S",
+        "chromeos": "Ctrl+Shift+S",
+        "linux": "Ctrl+Shift+S"
+      },
+      "description": "Copy formatted PR list to clipboard"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": ["*://github.com/*"],
+      "js": ["content.js"]
+    }
+  ]
 }
