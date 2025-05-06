@@ -22,7 +22,7 @@ When viewing PR files with the `?w=1` parameter, the extension automatically inc
 
 ### Keyboard Shortcuts
 
-1. **Toggle Viewed Checkboxes** - `Cmd+Shift+O` (Mac) or `Ctrl+Shift+O` (Windows/Linux)  
+1. **Toggle Viewed Checkboxes** - `Cmd+Shift+U` (Mac) or `Ctrl+Shift+U` (Windows/Linux)  
    Unchecks all currently checked "viewed" checkboxes in PR file views.
 
 2. **Copy PR List** - `Cmd+Shift+S` (Mac) or `Ctrl+Shift+S` (Windows/Linux)  
