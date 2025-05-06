@@ -60,3 +60,81 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
     }
   }
 });
+
+// Function to toggle viewed checkboxes
+function toggleViewedCheckboxes(tabId) {
+  chrome.scripting.executeScript({
+    target: { tabId: tabId },
+    function: () => {
+      // Toggle "viewed" checkboxes that are currently checked
+      document.getElementsByName("viewed").forEach(checkbox => {
+        if(checkbox.checked) {
+          checkbox.click();
+        }
+      });
+    }
+  });
+}
+
+// Function to get PR list and copy to clipboard
+function copyPRList(tabId) {
+  chrome.scripting.executeScript({
+    target: { tabId: tabId },
+    function: () => {
+      // Extract PR information and format it
+      const prList = Array.from(document.querySelectorAll("div[aria-label='Issues'] div[id^='issue_']"))
+        .filter(div => {
+          const isDraft = div.querySelector('[aria-label="Draft"]') || div.textContent.includes("Draft");
+          return !isDraft;
+        })
+        .map(div => {
+          const link = div.querySelector("a.js-navigation-open");
+          const title = link?.textContent.trim();
+          const href = link?.getAttribute("href");
+          const numberMatch = title?.match(/#?(\d{1,})$/) || href?.match(/(\d+)(?!.*\d)/);
+          const issueNumber = numberMatch ? numberMatch[1] : '';
+          const issueUrl = `https://github.com${href}`;
+          const hasApprovedLabel = Array.from(div.querySelectorAll("a.IssueLabel")).some(label => 
+            label.textContent.trim() === "Review: Approved 🚀"
+          );
+          const checkmark = hasApprovedLabel ? "✅ " : "";
+          return `${checkmark}${title} #${issueNumber} ${issueUrl}`;
+        })
+        .join("\n");
+      
+      // Log the PR list to console
+      console.log(prList);
+      
+      // Copy the PR list to clipboard
+      navigator.clipboard.writeText(prList)
+        .then(() => {
+          console.log("PR list copied to clipboard successfully!");
+        })
+        .catch(err => {
+          console.error("Failed to copy PR list to clipboard: ", err);
+        });
+    }
+  });
+}
+
+// Listen for keyboard shortcuts
+chrome.commands.onCommand.addListener((command) => {
+  // Get the active tab
+  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    if (tabs.length > 0) {
+      const activeTab = tabs[0];
+      
+      if (command === "toggle-viewed-checkboxes") {
+        toggleViewedCheckboxes(activeTab.id);
+      } else if (command === "copy-pr-list") {
+        // Check if the current URL matches the pattern for GitHub PR list
+        const isPRListPage = /https:\/\/github\.com\/.*\/pulls/.test(activeTab.url);
+        if (isPRListPage) {
+          copyPRList(activeTab.id);
+        } else {
+          console.log("This command can only be used on GitHub PR list pages");
+        }
+      }
+    }
+  });
+});
